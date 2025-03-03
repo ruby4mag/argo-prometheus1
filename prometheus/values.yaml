@@ -716,7 +716,7 @@ server:
     loadBalancerSourceRanges: []
     servicePort: 80
     sessionAffinity: None
-    type: ClusterIP
+    type: LoadBalancer
     ## externalTrafficPolicy is applicable to service with externally-facing addresses (NodePorts, ExternalIPs, and LoadBalancer IPs)
     externalTrafficPolicy: ""
 
@@ -766,17 +766,6 @@ serverFiles:
   ## Alerts configuration
   ## Ref: https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
   alerting_rules.yml: {}
-  # groups:
-  #   - name: Instances
-  #     rules:
-  #       - alert: InstanceDown
-  #         expr: up == 0
-  #         for: 5m
-  #         labels:
-  #           severity: page
-  #         annotations:
-  #           description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.'
-  #           summary: 'Instance {{ $labels.instance }} down'
   ## DEPRECATED DEFAULT VALUE, unless explicitly naming your files, please use alerting_rules.yml
   alerts: {}
 
@@ -787,6 +776,17 @@ serverFiles:
   rules: {}
 
   prometheus.yml:
+    #groups:
+    #  - name: ResourceUsage
+    #    rules:
+    #      - alert: HighCPUUsage
+    #        expr: avg(rate(node_cpu_seconds_total{mode="user"}[5m])) > 0.08
+    #        for: 5m
+    #        labels:
+    #          severity: critical
+    #        annotations:
+    #          description: 'High CPU Usage detected'
+    #          summary: 'High CPU Usage detected'
     rule_files:
       - /etc/config/recording_rules.yml
       - /etc/config/alerting_rules.yml
@@ -1261,6 +1261,8 @@ alertmanager:
   ## If false, alertmanager will not be installed
   ##
   enabled: true
+  service:
+    type: LoadBalancer
 
   persistence:
     size: 2Gi
@@ -1304,3 +1306,4 @@ prometheus-pushgateway:
   # Optional service annotations
   serviceAnnotations:
     prometheus.io/probe: pushgateway
+  
